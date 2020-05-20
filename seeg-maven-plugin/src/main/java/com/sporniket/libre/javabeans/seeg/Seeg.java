@@ -49,7 +49,7 @@ import java.util.Properties;
  * <hr>
  *
  * @author David SPORN
- * @version 20.04.04
+ * @version 20.05.00
  * @since 20.04.01
  */
 public class Seeg

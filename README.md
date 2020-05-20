@@ -33,6 +33,11 @@ In no particular order :
 
 See also the known issues.
 
+### What's new in v20.05.00
+
+* #55 : [bug][seeg] Using PostGreSQL enums require custom types
+* #57 : [bug][seeg] Hibernate require correctly named fields for idclasses
+
 ### What's new in v20.04.04
 
 * #53 : [bug][seeg]Hibernate cannot find properties of query method if internal name does not match
