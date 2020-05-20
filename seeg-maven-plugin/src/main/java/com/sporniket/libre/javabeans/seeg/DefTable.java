@@ -39,10 +39,23 @@ import java.util.Set;
 public class DefTable extends Def
 {
 
-	public final Map<String, DefColumn> columns = new HashMap<String, DefColumn>();
+	public final Map<String, DefColumn> columns = new HashMap<>();
 
 	public final Set<String> pkeysColumns = new LinkedHashSet<>(10);
 
-	public final Map<String, DefSelector> selectors = new HashMap<String, DefSelector>();
+	public final Map<String, DefSelector> selectors = new HashMap<>();
 
+	/**
+	 * <code>true</code> if at least one of the column use an enumeration type.
+	 *
+	 * @since 20.05.00
+	 */
+	public boolean useEnums = false;
+
+	/**
+	 * Type name (local in the target package or fully qualifiad class name) to typedef "pgsql_enum".
+	 *
+	 * @since 20.05.00
+	 */
+	public String typeDefPgEnum;
 }

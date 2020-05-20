@@ -62,4 +62,11 @@ public class DefColumn extends Def
 	 * <code>true</code> if the value MUST be non null at validation time.
 	 */
 	public boolean notNullable;
+
+	/**
+	 * <code>true</code> if the column use an enumeration type.
+	 * 
+	 * @since 20.05.00
+	 */
+	public boolean isEnum;
 }

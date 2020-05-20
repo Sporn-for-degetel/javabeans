@@ -39,10 +39,10 @@ public interface ExtractionWorkspace
 
 	Collection<DefEnum> getEnums();
 
-	void registerClass(final String table, final String comment);
+	void registerClass(final String table, final String comment, final String typeEnum);
 
 	void registerColumn(final String table, final String column, final String type, final String nullable, final String autoinc,
-			final String isGenerated, final String comment, final String defaultValue);
+			final String isGenerated, final String comment, final String defaultValue, String typeEnum);
 
 	void registerEnumValue(final String _name, final String _value);
 
