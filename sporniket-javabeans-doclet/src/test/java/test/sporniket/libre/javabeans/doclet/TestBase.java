@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.00
+ * @version 20.05.01
  * @since 19.03.00
  */
 public class TestBase

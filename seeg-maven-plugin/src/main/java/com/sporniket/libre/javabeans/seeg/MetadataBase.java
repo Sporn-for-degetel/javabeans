@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.00
+ * @version 20.05.01
  * @since 20.04.01
  */
 public abstract class MetadataBase implements Metadata

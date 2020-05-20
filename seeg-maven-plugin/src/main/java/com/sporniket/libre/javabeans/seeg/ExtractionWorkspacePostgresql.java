@@ -36,7 +36,7 @@ import java.util.Map;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.00
+ * @version 20.05.01
  * @since 20.04.01
  */
 public class ExtractionWorkspacePostgresql extends ExtractionWorkspaceBase implements ExtractionWorkspace

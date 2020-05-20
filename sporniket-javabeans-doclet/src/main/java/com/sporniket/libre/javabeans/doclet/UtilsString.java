@@ -31,7 +31,7 @@ import com.sporniket.strings.pipeline.StringTransformation;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.00
+ * @version 20.05.01
  * @since 19.03.00
  */
 public final class UtilsString
@@ -64,7 +64,7 @@ public final class UtilsString
 	 * <hr>
 	 *
 	 * @author David SPORN
-	 * @version 20.05.00
+	 * @version 20.05.01
 	 * @since 19.03.00
 	 */
 	public static final class Transformations
@@ -102,7 +102,7 @@ public final class UtilsString
 	 * <hr>
 	 *
 	 * @author David SPORN
-	 * @version 20.05.00
+	 * @version 20.05.01
 	 * @since 19.03.00
 	 */
 	public static final class TransformationFactories
