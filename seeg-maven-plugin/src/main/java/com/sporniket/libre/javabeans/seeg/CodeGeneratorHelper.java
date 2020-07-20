@@ -2,13 +2,16 @@ package com.sporniket.libre.javabeans.seeg;
 
 import static com.sporniket.libre.javabeans.seeg.StringHelper.uncapitalizeFirstLetter;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -59,6 +62,9 @@ public class CodeGeneratorHelper
 
 	private static final String JAVA_EXTENSION_SUFFIX = ".java";
 
+	private static final Set<String> JAVA_NATIVE_TYPES = new HashSet<String>(
+			asList("integer", "long", "fload", "double", "boolean"));
+
 	static final CodeGenerator<DefEnum> FROM_DEF_ENUM = (specs, targetDir, targetPackage, out) -> {
 		File target = new File(targetDir, specs.nameInJava + JAVA_EXTENSION_SUFFIX);
 		try (PrintStream _out = new PrintStream(target))
@@ -96,9 +102,13 @@ public class CodeGeneratorHelper
 				_out.println(format("/** %s. */", specs.comment));
 			}
 			_out.println("@org.springframework.data.repository.NoRepositoryBean");
-			final String _javaTypeOfPrimaryKey = 1 == specs.pkeysColumns.size()
+			String _javaTypeOfPrimaryKey = 1 == specs.pkeysColumns.size()
 					? specs.columns.get(specs.pkeysColumns.iterator().next()).javaType
 					: _idClassName;
+			if (JAVA_NATIVE_TYPES.contains(_javaTypeOfPrimaryKey))
+			{
+				_javaTypeOfPrimaryKey = StringHelper.camelCaseCapitalizedFromSnakeCase(_javaTypeOfPrimaryKey);
+			}
 			_out.println(format("public interface %s extends org.springframework.data.jpa.repository.JpaRepository<%s, %s> {",
 					_finderName, _entityName, _javaTypeOfPrimaryKey));
 			specs.selectors.values().forEach(s -> {
