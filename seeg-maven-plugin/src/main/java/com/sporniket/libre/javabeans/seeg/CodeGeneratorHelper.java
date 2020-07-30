@@ -189,7 +189,7 @@ public class CodeGeneratorHelper
 
 			// fields
 			Map<String, String> _fieldNames = new HashMap<>(specs.columns.size());
-			new TreeSet<>(specs.columns.keySet()).stream()//
+			new TreeSet<String>(specs.columns.keySet()).stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(colSpecs -> {
 						// field
@@ -349,8 +349,7 @@ public class CodeGeneratorHelper
 			_out.println();
 
 			// fields and accessors
-			Map<String, String> _fieldNames = new HashMap<>(specs.columns.size());
-			new TreeSet<>(specs.pkeysColumns).stream()//
+			new TreeSet<String>(specs.pkeysColumns).stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(colSpecs -> {
 						// field
@@ -362,9 +361,7 @@ public class CodeGeneratorHelper
 						{
 							_out.println("  " + ANNOTATION__NOT_NULL);
 						}
-						String _fieldName = uncapitalizeFirstLetter(colSpecs.nameInJava);
-						_fieldNames.put(colSpecs.nameInDatabase, _fieldName);
-						_out.println(format("  private final %s %s ;", colSpecs.javaType, _fieldName));
+						_out.println(format("  private final %s my%s ;", colSpecs.javaType, colSpecs.nameInJava));
 
 						// getter
 						if (null != colSpecs.comment)
@@ -373,8 +370,8 @@ public class CodeGeneratorHelper
 									format("  /**\n   * %s. \n   *\n   * @returns the current value. \n   */", colSpecs.comment));
 						}
 						_out.println(
-								format("  public %s%s get%s() { return %s ;} ", colSpecs.notNullable ? ANNOTATION__NOT_NULL : "",
-										colSpecs.javaType, colSpecs.nameInJava, _fieldName));
+								format("  public %s%s get%s() { return my%s ;} ", colSpecs.notNullable ? ANNOTATION__NOT_NULL : "",
+										colSpecs.javaType, colSpecs.nameInJava, colSpecs.nameInJava));
 
 						// done
 						_out.println();
@@ -384,15 +381,14 @@ public class CodeGeneratorHelper
 			String _constructorArgs = specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
 					.map(c -> format("%s%s %s", c.notNullable ? ANNOTATION__NOT_NULL : "", c.javaType,
-							_fieldNames.get(c.nameInDatabase)))//
+							uncapitalizeFirstLetter(c.nameInJava)))//
 					.collect(Collectors.joining(", "));
 			_out.println();
 			_out.println(format("  public %s(%s) {", _idClassName, _constructorArgs));
 			specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(c -> {
-						String _fieldName = _fieldNames.get(c.nameInDatabase);
-						_out.println(format("    this.%s = %s ;", _fieldName, _fieldName));
+						_out.println(format("    my%s = %s ;", c.nameInJava, uncapitalizeFirstLetter(c.nameInJava)));
 					});
 			_out.println("  }");
 
@@ -406,8 +402,8 @@ public class CodeGeneratorHelper
 			specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(c -> {
-						_out.println(format("    if (!java.util.Objects.equals(%s, _id.get%s())) return false ;",
-								_fieldNames.get(c.nameInDatabase), c.nameInJava));
+						_out.println(format("    if (!java.util.Objects.equals(my%s, _id.get%s())) return false ;", c.nameInJava,
+								c.nameInJava));
 					});
 			_out.println("    return true;");
 			_out.println("  }");
@@ -415,7 +411,7 @@ public class CodeGeneratorHelper
 			// hashcode
 			final String _hashComponents = specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
-					.map(c -> _fieldNames.get(c.nameInDatabase))//
+					.map(c -> format("my%s", c.nameInJava))//
 					.collect(Collectors.joining(", "));
 			_out.println();
 			_out.println(format("  public int hashCode() { return java.util.Objects.hash(%s) ; }", _hashComponents));
