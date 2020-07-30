@@ -33,7 +33,7 @@ import java.util.List;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.05.00
  * @since 18.10.00
  */
 class AnnotationParameterSpecsValuesArrayRaw extends AnnotationParameterSpecsRaw

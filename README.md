@@ -33,10 +33,6 @@ In no particular order :
 
 See also the known issues.
 
-### What's new in v20.05.01
-
-* #56 : [bug][seed] the id class require a no-args constructor
-
 ### What's new in v20.05.00
 
 * #55 : [bug][seeg] Using PostGreSQL enums require custom types

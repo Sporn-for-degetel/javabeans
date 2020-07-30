@@ -31,7 +31,7 @@ package test.sporniket.libre.javabeans.mockjavadoc;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.05.00
  * @since 19.03.00
  */
 class TypeMockModel_Raw extends ProgramElementDocMockModel_Raw
