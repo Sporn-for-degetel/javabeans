@@ -28,7 +28,7 @@ package com.sporniket.libre.javabeans.doclet;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.04.04
  * @since 17.09.00
  */
 public interface BuilderGenerator extends JavaSourceGenerator

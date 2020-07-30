@@ -2,20 +2,15 @@ package com.sporniket.libre.javabeans.seeg;
 
 import static com.sporniket.libre.javabeans.seeg.StringHelper.uncapitalizeFirstLetter;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Pool of code generators.
@@ -45,7 +40,7 @@ import org.apache.commons.lang3.StringUtils;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.04.04
  * @since 20.04.01
  */
 public class CodeGeneratorHelper
@@ -61,9 +56,6 @@ public class CodeGeneratorHelper
 	private static final String ANNOTATION__NOT_NULL = "@javax.validation.constraints.NotNull ";
 
 	private static final String JAVA_EXTENSION_SUFFIX = ".java";
-
-	private static final Set<String> JAVA_NATIVE_TYPES = new HashSet<String>(
-			asList("integer", "long", "fload", "double", "boolean"));
 
 	static final CodeGenerator<DefEnum> FROM_DEF_ENUM = (specs, targetDir, targetPackage, out) -> {
 		File target = new File(targetDir, specs.nameInJava + JAVA_EXTENSION_SUFFIX);
@@ -102,13 +94,9 @@ public class CodeGeneratorHelper
 				_out.println(format("/** %s. */", specs.comment));
 			}
 			_out.println("@org.springframework.data.repository.NoRepositoryBean");
-			String _javaTypeOfPrimaryKey = 1 == specs.pkeysColumns.size()
+			final String _javaTypeOfPrimaryKey = 1 == specs.pkeysColumns.size()
 					? specs.columns.get(specs.pkeysColumns.iterator().next()).javaType
 					: _idClassName;
-			if (JAVA_NATIVE_TYPES.contains(_javaTypeOfPrimaryKey))
-			{
-				_javaTypeOfPrimaryKey = StringHelper.camelCaseCapitalizedFromSnakeCase(_javaTypeOfPrimaryKey);
-			}
 			_out.println(format("public interface %s extends org.springframework.data.jpa.repository.JpaRepository<%s, %s> {",
 					_finderName, _entityName, _javaTypeOfPrimaryKey));
 			specs.selectors.values().forEach(s -> {
@@ -197,16 +185,11 @@ public class CodeGeneratorHelper
 			{
 				_out.println(format("@javax.persistence.IdClass(%s.class)", _idClassName));
 			}
-			if (specs.useEnums && StringUtils.isNotBlank(specs.typeDefPgEnum))
-			{
-				_out.println(format("@org.hibernate.annotations.TypeDef(name = \"pgsql_enum\", typeClass = %s.class)",
-						specs.typeDefPgEnum));
-			}
 			_out.println(format("public class %s {", _entityName));
 
 			// fields
 			Map<String, String> _fieldNames = new HashMap<>(specs.columns.size());
-			new TreeSet<>(specs.columns.keySet()).stream()//
+			new TreeSet<String>(specs.columns.keySet()).stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(colSpecs -> {
 						// field
@@ -215,14 +198,6 @@ public class CodeGeneratorHelper
 							_out.println(format("  /**\n   *%s. \n   */", colSpecs.comment));
 						}
 						_out.println(format("  @javax.persistence.Column(name = \"%s\")", colSpecs.nameInDatabase));
-						if (colSpecs.isEnum)
-						{
-							_out.println("  @javax.persistence.Enumerated(javax.persistence.EnumType.STRING)");
-							if (StringUtils.isNotBlank(specs.typeDefPgEnum))
-							{
-								_out.println("  @org.hibernate.annotations.Type(type = \"pgsql_enum\")");
-							}
-						}
 						if (colSpecs.generated)
 						{
 							if (null != colSpecs.generationStrategy)
@@ -374,8 +349,7 @@ public class CodeGeneratorHelper
 			_out.println();
 
 			// fields and accessors
-			Map<String, String> _fieldNames = new HashMap<>(specs.columns.size());
-			new TreeSet<>(specs.pkeysColumns).stream()//
+			new TreeSet<String>(specs.pkeysColumns).stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(colSpecs -> {
 						// field
@@ -387,9 +361,7 @@ public class CodeGeneratorHelper
 						{
 							_out.println("  " + ANNOTATION__NOT_NULL);
 						}
-						String _fieldName = uncapitalizeFirstLetter(colSpecs.nameInJava);
-						_fieldNames.put(colSpecs.nameInDatabase, _fieldName);
-						_out.println(format("  private %s %s ;", colSpecs.javaType, _fieldName));
+						_out.println(format("  private final %s my%s ;", colSpecs.javaType, colSpecs.nameInJava));
 
 						// getter
 						if (null != colSpecs.comment)
@@ -398,8 +370,8 @@ public class CodeGeneratorHelper
 									format("  /**\n   * %s. \n   *\n   * @returns the current value. \n   */", colSpecs.comment));
 						}
 						_out.println(
-								format("  public %s%s get%s() { return %s ;} ", colSpecs.notNullable ? ANNOTATION__NOT_NULL : "",
-										colSpecs.javaType, colSpecs.nameInJava, _fieldName));
+								format("  public %s%s get%s() { return my%s ;} ", colSpecs.notNullable ? ANNOTATION__NOT_NULL : "",
+										colSpecs.javaType, colSpecs.nameInJava, colSpecs.nameInJava));
 
 						// done
 						_out.println();
@@ -409,16 +381,14 @@ public class CodeGeneratorHelper
 			String _constructorArgs = specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
 					.map(c -> format("%s%s %s", c.notNullable ? ANNOTATION__NOT_NULL : "", c.javaType,
-							_fieldNames.get(c.nameInDatabase)))//
+							uncapitalizeFirstLetter(c.nameInJava)))//
 					.collect(Collectors.joining(", "));
 			_out.println();
-			_out.println(format("  public %s() {}", _idClassName));
 			_out.println(format("  public %s(%s) {", _idClassName, _constructorArgs));
 			specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(c -> {
-						String _fieldName = _fieldNames.get(c.nameInDatabase);
-						_out.println(format("    this.%s = %s ;", _fieldName, _fieldName));
+						_out.println(format("    my%s = %s ;", c.nameInJava, uncapitalizeFirstLetter(c.nameInJava)));
 					});
 			_out.println("  }");
 
@@ -432,8 +402,8 @@ public class CodeGeneratorHelper
 			specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
 					.forEach(c -> {
-						_out.println(format("    if (!java.util.Objects.equals(%s, _id.get%s())) return false ;",
-								_fieldNames.get(c.nameInDatabase), c.nameInJava));
+						_out.println(format("    if (!java.util.Objects.equals(my%s, _id.get%s())) return false ;", c.nameInJava,
+								c.nameInJava));
 					});
 			_out.println("    return true;");
 			_out.println("  }");
@@ -441,7 +411,7 @@ public class CodeGeneratorHelper
 			// hashcode
 			final String _hashComponents = specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
-					.map(c -> _fieldNames.get(c.nameInDatabase))//
+					.map(c -> format("my%s", c.nameInJava))//
 					.collect(Collectors.joining(", "));
 			_out.println();
 			_out.println(format("  public int hashCode() { return java.util.Objects.hash(%s) ; }", _hashComponents));

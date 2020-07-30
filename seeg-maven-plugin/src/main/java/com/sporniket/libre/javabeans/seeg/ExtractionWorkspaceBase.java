@@ -35,15 +35,15 @@ import java.util.Map;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.04.04
  * @since 20.04.01
  */
 public abstract class ExtractionWorkspaceBase implements ExtractionWorkspace
 {
 
-	protected final Map<String, DefTable> regClasses = new HashMap<>();
+	protected final Map<String, DefTable> regClasses = new HashMap<String, DefTable>();
 
-	protected final Map<String, DefEnum> regEnums = new HashMap<>();
+	protected final Map<String, DefEnum> regEnums = new HashMap<String, DefEnum>();
 
 	public ExtractionWorkspaceBase()
 	{
@@ -72,13 +72,12 @@ public abstract class ExtractionWorkspaceBase implements ExtractionWorkspace
 	}
 
 	@Override
-	public void registerClass(final String table, final String comment, final String typeEnum)
+	public void registerClass(final String table, final String comment)
 	{
 		DefTable _class = new DefTable();
 		_class.nameInDatabase = table;
 		_class.nameInJava = camelCaseCapitalizedFromSnakeCase(table);
 		_class.comment = comment;
-		_class.typeDefPgEnum = typeEnum;
 		regClasses.put(table, _class);
 	}
 

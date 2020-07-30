@@ -18,7 +18,7 @@ import java.util.Properties;
 
 /**
  * Seeg : Sporniket Entities Extractor and Generator.
- *
+ * 
  * <p>
  * Utility program that connects to a database, and generate Java JPA entities and Spring-data-jpa repositories from the tables of a
  * schema.
@@ -49,7 +49,7 @@ import java.util.Properties;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.04.04
  * @since 20.04.01
  */
 public class Seeg
@@ -59,7 +59,7 @@ public class Seeg
 		if (args.length < 3 || args.length > 4)
 		{
 			System.out.println(
-					"Usage: java com.sporniket.libre.javabeans.seeg.Seeg configDatabase targetDir targetPackage [schema [typeEnum]].");
+					"Usage: java com.sporniket.libre.javabeans.seeg.Seeg configDatabase targetDir targetPackage [schema].");
 			System.out.println("    configDatabase : properties file describing the connection to the database.");
 			System.out.println("        - url : jdbc url, e.g. 'jdbc:postgresql://localhost:54320/postgres'.");
 			System.out.println("        - driverClass : jdbc url, e.g. 'org.postgresql.Driver'.");
@@ -69,7 +69,6 @@ public class Seeg
 			System.out.println("    targetPackage : fully qualified name of the Java package of the generated sources.");
 			System.out.println("        e.g. 'com.foo.entities'.");
 			System.out.println("    schema : optionnal, name of the database schema to inspect.");
-			System.out.println("    typeEnum : optionnal (schema required), custom type to map enum types.");
 
 			System.exit(1);
 		}
@@ -79,7 +78,6 @@ public class Seeg
 		String targetDir = args[1];
 		String targetPackage = args[2];
 		String schema = args.length >= 4 ? args[3] : null;
-		String enumType = args.length >= 5 ? args[4] : null;
 
 		Seeg work = new Seeg();
 		try
@@ -131,17 +129,11 @@ public class Seeg
 
 	public void perform(final String configDatabase, String targetDir, String targetPackage, String schema) throws Exception
 	{
-		perform(configDatabase, targetDir, targetPackage, schema, null);
+		perform(configDatabase, targetDir, targetPackage, schema, System.out);
 	}
 
-	public void perform(final String configDatabase, String targetDir, String targetPackage, String schema, String typeEnum)
+	public void perform(final String configDatabase, String targetDir, String targetPackage, String schema, PrintStream out)
 			throws Exception
-	{
-		perform(configDatabase, targetDir, targetPackage, schema, typeEnum, System.out);
-	}
-
-	public void perform(final String configDatabase, String targetDir, String targetPackage, String schema, String typeEnum,
-			PrintStream out) throws Exception
 	{
 		checkTargetDirectoryOrDie(targetDir, out);
 		try (Connection con = getConnection(configDatabase))
@@ -167,7 +159,7 @@ public class Seeg
 				final String _name = r.getString("TABLE_NAME");
 				final String _comment = r.getString("REMARKS");
 				out.println(format("%s (%s) : %s ", _name, r.getString("SELF_REFERENCING_COL_NAME"), _comment));
-				workspace.registerClass(_name, _comment, typeEnum);
+				workspace.registerClass(_name, _comment);
 			}
 			printHeader(out, "Columns");
 			for (ResultSet r = _metadata.getColumns(schema); r.next();)
@@ -182,7 +174,7 @@ public class Seeg
 				final String _comment = r.getString("REMARKS");
 				out.println(format("%s.%s (%s -- %s) -- nullable (%s) default (%s) autoinc(%s) generated (%s): %s ", _table,
 						_column, _type, r.getString("DATA_TYPE"), _nullable, _default, _autoinc, _generated, _comment));
-				workspace.registerColumn(_table, _column, _type, _nullable, _autoinc, _generated, _comment, _default, typeEnum);
+				workspace.registerColumn(_table, _column, _type, _nullable, _autoinc, _generated, _comment, _default);
 			}
 			printHeader(out, "Primary Keys");
 			for (DefTable c : workspace.getClasses())

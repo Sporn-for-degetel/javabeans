@@ -28,7 +28,7 @@ package com.sporniket.libre.javabeans.seeg;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.04.04
  * @since 20.04.01
  */
 public class Def

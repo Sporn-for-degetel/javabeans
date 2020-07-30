@@ -30,7 +30,7 @@ import java.util.Collection;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.01
+ * @version 20.04.04
  * @since 20.04.01
  */
 public interface ExtractionWorkspace
@@ -39,10 +39,10 @@ public interface ExtractionWorkspace
 
 	Collection<DefEnum> getEnums();
 
-	void registerClass(final String table, final String comment, final String typeEnum);
+	void registerClass(final String table, final String comment);
 
 	void registerColumn(final String table, final String column, final String type, final String nullable, final String autoinc,
-			final String isGenerated, final String comment, final String defaultValue, String typeEnum);
+			final String isGenerated, final String comment, final String defaultValue);
 
 	void registerEnumValue(final String _name, final String _value);
 
