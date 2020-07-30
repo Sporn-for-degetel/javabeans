@@ -36,7 +36,7 @@ import com.sporniket.libre.javabeans.doclet.codespecs.ClassSpecs;
  * <hr>
  *
  * @author David SPORN
- * @version 20.05.00
+ * @version 20.04.04
  * @since 17.09.00
  */
 public class Builder<G extends BasicGenerator>
