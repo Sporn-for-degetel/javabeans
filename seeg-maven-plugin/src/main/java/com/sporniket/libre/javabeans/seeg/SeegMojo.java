@@ -62,11 +62,11 @@ public class SeegMojo extends AbstractMojo
 
 	/**
 	 * Configuration of the connection to the database.
-	 *
+	 * 
 	 * <p>
 	 * A property file that MUST contains the following keys :
 	 * </p>
-	 *
+	 * 
 	 * <ul>
 	 * <li>url : jdbc url, e.g. 'jdbc:postgresql://localhost:54320/postgres'.</li>
 	 * <li>driverClass : jdbc url, e.g. 'org.postgresql.Driver'.</li>
@@ -89,13 +89,6 @@ public class SeegMojo extends AbstractMojo
 	@Parameter(property = "schemaName", required = false)
 	private String schemaName;
 
-	/**
-	 * Optionnal, name of the custom hibernate type for enumeration (to support PostgreSql enums) ; either a class inside the target
-	 * package, or a fully qualified class name.
-	 */
-	@Parameter(property = "typeEnum", required = false)
-	private String typeEnum;
-
 	@Override
 	public void execute() throws MojoExecutionException
 	{
@@ -107,19 +100,18 @@ public class SeegMojo extends AbstractMojo
 		String _targetDirectory = new File(sourceDirectory, _localPath).getAbsolutePath();
 		String _connectionConfiguration = connectionConfiguration.getAbsolutePath();
 		String _schemaName = StringUtils.trimToNull(schemaName);
-		String _typeEnum = StringUtils.trimToNull(typeEnum);
 
 		try (PipedInputStream pis = new PipedInputStream();
 				PipedOutputStream pos = new PipedOutputStream(pis);
 				BufferedReader br = new BufferedReader(new InputStreamReader(pis), 32000);
 				PrintStream out = new PrintStream(pos);)
 		{
-			final List<Throwable> errorStack = new ArrayList<>(1);
+			final List<Throwable> errorStack = new ArrayList<Throwable>(1);
 			final ExecutorService executor = newSingleThreadExecutor();
 			executor.submit(() -> {
 				try
 				{
-					new Seeg().perform(_connectionConfiguration, _targetDirectory, targetPackage, _schemaName, _typeEnum, out);
+					new Seeg().perform(_connectionConfiguration, _targetDirectory, targetPackage, _schemaName, out);
 				}
 				catch (Exception _error)
 				{

@@ -119,11 +119,11 @@ public class ExtractionWorkspacePostgresql extends ExtractionWorkspaceBase imple
 
 	@Override
 	public void registerColumn(final String table, final String column, final String type, final String nullable,
-			final String autoinc, final String isGenerated, final String comment, final String defaultValue, String typeEnum)
+			final String autoinc, final String isGenerated, final String comment, final String defaultValue)
 	{
 		if (!regClasses.containsKey(table))
 		{
-			registerClass(table, null, typeEnum);
+			registerClass(table, null);
 		}
 		DefTable _parent = regClasses.get(table);
 		DefColumn _c = new DefColumn();
@@ -169,8 +169,6 @@ public class ExtractionWorkspacePostgresql extends ExtractionWorkspaceBase imple
 			String _enum = _path[_path.length - 1];
 			_enum = undoublequote(_enum);
 			_c.javaType = regEnums.get(_enum).nameInJava;
-			_c.isEnum = true;
-			_parent.useEnums = true;
 		}
 		_parent.columns.put(column, _c);
 	}

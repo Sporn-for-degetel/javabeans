@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Pool of code generators.
  *
@@ -187,11 +185,6 @@ public class CodeGeneratorHelper
 			{
 				_out.println(format("@javax.persistence.IdClass(%s.class)", _idClassName));
 			}
-			if (specs.useEnums && StringUtils.isNotBlank(specs.typeDefPgEnum))
-			{
-				_out.println(format("@org.hibernate.annotations.TypeDef(name = \"pgsql_enum\", typeClass = %s.class)",
-						specs.typeDefPgEnum));
-			}
 			_out.println(format("public class %s {", _entityName));
 
 			// fields
@@ -205,14 +198,6 @@ public class CodeGeneratorHelper
 							_out.println(format("  /**\n   *%s. \n   */", colSpecs.comment));
 						}
 						_out.println(format("  @javax.persistence.Column(name = \"%s\")", colSpecs.nameInDatabase));
-						if (colSpecs.isEnum)
-						{
-							_out.println("  @javax.persistence.Enumerated(javax.persistence.EnumType.STRING)");
-							if (StringUtils.isNotBlank(specs.typeDefPgEnum))
-							{
-								_out.println("  @org.hibernate.annotations.Type(type = \"pgsql_enum\")");
-							}
-						}
 						if (colSpecs.generated)
 						{
 							if (null != colSpecs.generationStrategy)
