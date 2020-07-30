@@ -379,7 +379,7 @@ public class CodeGeneratorHelper
 						}
 						String _fieldName = uncapitalizeFirstLetter(colSpecs.nameInJava);
 						_fieldNames.put(colSpecs.nameInDatabase, _fieldName);
-						_out.println(format("  private %s %s ;", colSpecs.javaType, _fieldName));
+						_out.println(format("  private final %s %s ;", colSpecs.javaType, _fieldName));
 
 						// getter
 						if (null != colSpecs.comment)
@@ -402,7 +402,6 @@ public class CodeGeneratorHelper
 							_fieldNames.get(c.nameInDatabase)))//
 					.collect(Collectors.joining(", "));
 			_out.println();
-			_out.println(format("  public %s() {}", _idClassName));
 			_out.println(format("  public %s(%s) {", _idClassName, _constructorArgs));
 			specs.pkeysColumns.stream()//
 					.map(k -> specs.columns.get(k))//
